@@ -1,0 +1,125 @@
+TOKENS
+lin:col  tipo       lexema
+1:1      id         x
+1:2      :          :
+1:4      integer    integer
+1:11     ;          ;
+2:1      procedure  procedure
+2:11     id         p
+2:12     ;          ;
+3:1      begin      begin
+4:3      id         x
+4:5      :=         :=
+4:8      num_int    1
+4:10     +          +
+4:12     num_int    2
+5:1      end        end
+5:4      ;          ;
+6:1      $          $
+
+SIMULAÇÃO DO AUTÔMATO COM PILHA
+passo | pilha (topo à esquerda)                                              | entrada                          | ação
+--------------------------------------------------------------------------------------------------------------------------------
+    1 | Programa $                                                           | x : integer ; procedure …        | expandir (1) Programa -> ListaDecl
+    2 | ListaDecl $                                                          | x : integer ; procedure …        | expandir (2) ListaDecl -> Decl ListaDecl
+    3 | Decl ListaDecl $                                                     | x : integer ; procedure …        | expandir (4) Decl -> DeclVar
+    4 | DeclVar ListaDecl $                                                  | x : integer ; procedure …        | expandir (7) DeclVar -> id IdsCauda : Tipo ;
+    5 | id IdsCauda : Tipo ; ListaDecl $                                     | x : integer ; procedure …        | casar 'x'
+    6 | IdsCauda : Tipo ; ListaDecl $                                        | : integer ; procedure p …        | expandir (9) IdsCauda -> ε
+    7 | : Tipo ; ListaDecl $                                                 | : integer ; procedure p …        | casar ':'
+    8 | Tipo ; ListaDecl $                                                   | integer ; procedure p ; …        | expandir (10) Tipo -> integer
+    9 | integer ; ListaDecl $                                                | integer ; procedure p ; …        | casar 'integer'
+   10 | ; ListaDecl $                                                        | ; procedure p ; begin …          | casar ';'
+   11 | ListaDecl $                                                          | procedure p ; begin x …          | expandir (2) ListaDecl -> Decl ListaDecl
+   12 | Decl ListaDecl $                                                     | procedure p ; begin x …          | expandir (5) Decl -> DeclProc
+   13 | DeclProc ListaDecl $                                                 | procedure p ; begin x …          | expandir (13) DeclProc -> procedure id Params ; Locais Bloco ;
+   14 | procedure id Params ; Locais Bloco ; ListaDecl $                     | procedure p ; begin x …          | casar 'procedure'
+   15 | id Params ; Locais Bloco ; ListaDecl $                               | p ; begin x := …                 | casar 'p'
+   16 | Params ; Locais Bloco ; ListaDecl $                                  | ; begin x := 1 …                 | expandir (16) Params -> ε
+   17 | ; Locais Bloco ; ListaDecl $                                         | ; begin x := 1 …                 | casar ';'
+   18 | Locais Bloco ; ListaDecl $                                           | begin x := 1 + …                 | expandir (22) Locais -> ε
+   19 | Bloco ; ListaDecl $                                                  | begin x := 1 + …                 | expandir (25) Bloco -> begin ListaCmd end
+   20 | begin ListaCmd end ; ListaDecl $                                     | begin x := 1 + …                 | casar 'begin'
+   21 | ListaCmd end ; ListaDecl $                                           | x := 1 + 2 …                     | expandir (26) ListaCmd -> Cmd CmdCauda
+   22 | Cmd CmdCauda end ; ListaDecl $                                       | x := 1 + 2 …                     | expandir (29) Cmd -> id CmdId
+   23 | id CmdId CmdCauda end ; ListaDecl $                                  | x := 1 + 2 …                     | casar 'x'
+   24 | CmdId CmdCauda end ; ListaDecl $                                     | := 1 + 2 end …                   | expandir (34) CmdId -> := Expr
+   25 | := Expr CmdCauda end ; ListaDecl $                                   | := 1 + 2 end …                   | casar ':='
+   26 | Expr CmdCauda end ; ListaDecl $                                      | 1 + 2 end ; …                    | expandir (39) Expr -> ExprSimples ExprCauda
+   27 | ExprSimples ExprCauda CmdCauda end ; ListaDecl $                     | 1 + 2 end ; …                    | expandir (48) ExprSimples -> Termo SimplesCauda
+   28 | Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $              | 1 + 2 end ; …                    | expandir (54) Termo -> Fator TermoCauda
+   29 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $   | 1 + 2 end ; …                    | expandir (62) Fator -> num_int
+   30 | num_int TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $ | 1 + 2 end ; …                    | casar '1'
+   31 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $         | + 2 end ; $                      | expandir (56) TermoCauda -> ε
+   32 | SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                    | + 2 end ; $                      | expandir (49) SimplesCauda -> Addop Termo SimplesCauda
+   33 | Addop Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $        | + 2 end ; $                      | expandir (51) Addop -> +
+   34 | + Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $            | + 2 end ; $                      | casar '+'
+   35 | Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $              | 2 end ; $                        | expandir (54) Termo -> Fator TermoCauda
+   36 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $   | 2 end ; $                        | expandir (62) Fator -> num_int
+   37 | num_int TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $ | 2 end ; $                        | casar '2'
+   38 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $         | end ; $                          | expandir (56) TermoCauda -> ε
+   39 | SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                    | end ; $                          | expandir (50) SimplesCauda -> ε
+   40 | ExprCauda CmdCauda end ; ListaDecl $                                 | end ; $                          | expandir (41) ExprCauda -> ε
+   41 | CmdCauda end ; ListaDecl $                                           | end ; $                          | expandir (28) CmdCauda -> ε
+   42 | end ; ListaDecl $                                                    | end ; $                          | casar 'end'
+   43 | ; ListaDecl $                                                        | ; $                              | casar ';'
+   44 | ListaDecl $                                                          | $                                | expandir (3) ListaDecl -> ε
+   45 | $                                                                    | $                                | ACEITAR
+
+ÁRVORE DE DERIVAÇÃO
+Programa
+└── ListaDecl
+    ├── Decl
+    │   └── DeclVar
+    │       ├── id  «x»
+    │       ├── IdsCauda
+    │       │   └── ε
+    │       ├── :  «:»
+    │       ├── Tipo
+    │       │   └── integer  «integer»
+    │       └── ;  «;»
+    └── ListaDecl
+        ├── Decl
+        │   └── DeclProc
+        │       ├── procedure  «procedure»
+        │       ├── id  «p»
+        │       ├── Params
+        │       │   └── ε
+        │       ├── ;  «;»
+        │       ├── Locais
+        │       │   └── ε
+        │       ├── Bloco
+        │       │   ├── begin  «begin»
+        │       │   ├── ListaCmd
+        │       │   │   ├── Cmd
+        │       │   │   │   ├── id  «x»
+        │       │   │   │   └── CmdId
+        │       │   │   │       ├── :=  «:=»
+        │       │   │   │       └── Expr
+        │       │   │   │           ├── ExprSimples
+        │       │   │   │           │   ├── Termo
+        │       │   │   │           │   │   ├── Fator
+        │       │   │   │           │   │   │   └── num_int  «1»
+        │       │   │   │           │   │   └── TermoCauda
+        │       │   │   │           │   │       └── ε
+        │       │   │   │           │   └── SimplesCauda
+        │       │   │   │           │       ├── Addop
+        │       │   │   │           │       │   └── +  «+»
+        │       │   │   │           │       ├── Termo
+        │       │   │   │           │       │   ├── Fator
+        │       │   │   │           │       │   │   └── num_int  «2»
+        │       │   │   │           │       │   └── TermoCauda
+        │       │   │   │           │       │       └── ε
+        │       │   │   │           │       └── SimplesCauda
+        │       │   │   │           │           └── ε
+        │       │   │   │           └── ExprCauda
+        │       │   │   │               └── ε
+        │       │   │   └── CmdCauda
+        │       │   │       └── ε
+        │       │   └── end  «end»
+        │       └── ;  «;»
+        └── ListaDecl
+            └── ε
+
+Tokens: 15 | Passos do autômato: 45
+Resultado: ACEITO (a entrada pertence à linguagem miniPascal)

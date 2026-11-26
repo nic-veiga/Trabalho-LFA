@@ -1,0 +1,580 @@
+SIMULAÇÃO DO AUTÔMATO COM PILHA
+passo | pilha (topo à esquerda)                                                                                                     | entrada                          | ação
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    1 | Programa $                                                                                                                  | total , contador : integer …     | expandir (1) Programa -> ListaDecl
+    2 | ListaDecl $                                                                                                                 | total , contador : integer …     | expandir (2) ListaDecl -> Decl ListaDecl
+    3 | Decl ListaDecl $                                                                                                            | total , contador : integer …     | expandir (4) Decl -> DeclVar
+    4 | DeclVar ListaDecl $                                                                                                         | total , contador : integer …     | expandir (7) DeclVar -> id IdsCauda : Tipo ;
+    5 | id IdsCauda : Tipo ; ListaDecl $                                                                                            | total , contador : integer …     | casar 'total'
+    6 | IdsCauda : Tipo ; ListaDecl $                                                                                               | , contador : integer ; …         | expandir (8) IdsCauda -> , id IdsCauda
+    7 | , id IdsCauda : Tipo ; ListaDecl $                                                                                          | , contador : integer ; …         | casar ','
+    8 | id IdsCauda : Tipo ; ListaDecl $                                                                                            | contador : integer ; media …     | casar 'contador'
+    9 | IdsCauda : Tipo ; ListaDecl $                                                                                               | : integer ; media : …            | expandir (9) IdsCauda -> ε
+   10 | : Tipo ; ListaDecl $                                                                                                        | : integer ; media : …            | casar ':'
+   11 | Tipo ; ListaDecl $                                                                                                          | integer ; media : real …         | expandir (10) Tipo -> integer
+   12 | integer ; ListaDecl $                                                                                                       | integer ; media : real …         | casar 'integer'
+   13 | ; ListaDecl $                                                                                                               | ; media : real ; …               | casar ';'
+   14 | ListaDecl $                                                                                                                 | media : real ; ativo …           | expandir (2) ListaDecl -> Decl ListaDecl
+   15 | Decl ListaDecl $                                                                                                            | media : real ; ativo …           | expandir (4) Decl -> DeclVar
+   16 | DeclVar ListaDecl $                                                                                                         | media : real ; ativo …           | expandir (7) DeclVar -> id IdsCauda : Tipo ;
+   17 | id IdsCauda : Tipo ; ListaDecl $                                                                                            | media : real ; ativo …           | casar 'media'
+   18 | IdsCauda : Tipo ; ListaDecl $                                                                                               | : real ; ativo : …               | expandir (9) IdsCauda -> ε
+   19 | : Tipo ; ListaDecl $                                                                                                        | : real ; ativo : …               | casar ':'
+   20 | Tipo ; ListaDecl $                                                                                                          | real ; ativo : boolean …         | expandir (11) Tipo -> real
+   21 | real ; ListaDecl $                                                                                                          | real ; ativo : boolean …         | casar 'real'
+   22 | ; ListaDecl $                                                                                                               | ; ativo : boolean ; …            | casar ';'
+   23 | ListaDecl $                                                                                                                 | ativo : boolean ; function …     | expandir (2) ListaDecl -> Decl ListaDecl
+   24 | Decl ListaDecl $                                                                                                            | ativo : boolean ; function …     | expandir (4) Decl -> DeclVar
+   25 | DeclVar ListaDecl $                                                                                                         | ativo : boolean ; function …     | expandir (7) DeclVar -> id IdsCauda : Tipo ;
+   26 | id IdsCauda : Tipo ; ListaDecl $                                                                                            | ativo : boolean ; function …     | casar 'ativo'
+   27 | IdsCauda : Tipo ; ListaDecl $                                                                                               | : boolean ; function fatorial …  | expandir (9) IdsCauda -> ε
+   28 | : Tipo ; ListaDecl $                                                                                                        | : boolean ; function fatorial …  | casar ':'
+   29 | Tipo ; ListaDecl $                                                                                                          | boolean ; function fatorial ( …  | expandir (12) Tipo -> boolean
+   30 | boolean ; ListaDecl $                                                                                                       | boolean ; function fatorial ( …  | casar 'boolean'
+   31 | ; ListaDecl $                                                                                                               | ; function fatorial ( n …        | casar ';'
+   32 | ListaDecl $                                                                                                                 | function fatorial ( n : …        | expandir (2) ListaDecl -> Decl ListaDecl
+   33 | Decl ListaDecl $                                                                                                            | function fatorial ( n : …        | expandir (6) Decl -> DeclFunc
+   34 | DeclFunc ListaDecl $                                                                                                        | function fatorial ( n : …        | expandir (14) DeclFunc -> function id Params : Tipo ; Locais Bloco ;
+   35 | function id Params : Tipo ; Locais Bloco ; ListaDecl $                                                                      | function fatorial ( n : …        | casar 'function'
+   36 | id Params : Tipo ; Locais Bloco ; ListaDecl $                                                                               | fatorial ( n : integer …         | casar 'fatorial'
+   37 | Params : Tipo ; Locais Bloco ; ListaDecl $                                                                                  | ( n : integer ) …                | expandir (15) Params -> ( ListaParam )
+   38 | ( ListaParam ) : Tipo ; Locais Bloco ; ListaDecl $                                                                          | ( n : integer ) …                | casar '('
+   39 | ListaParam ) : Tipo ; Locais Bloco ; ListaDecl $                                                                            | n : integer ) : …                | expandir (17) ListaParam -> Param ParamCauda
+   40 | Param ParamCauda ) : Tipo ; Locais Bloco ; ListaDecl $                                                                      | n : integer ) : …                | expandir (20) Param -> id IdsCauda : Tipo
+   41 | id IdsCauda : Tipo ParamCauda ) : Tipo ; Locais Bloco ; ListaDecl $                                                         | n : integer ) : …                | casar 'n'
+   42 | IdsCauda : Tipo ParamCauda ) : Tipo ; Locais Bloco ; ListaDecl $                                                            | : integer ) : integer …          | expandir (9) IdsCauda -> ε
+   43 | : Tipo ParamCauda ) : Tipo ; Locais Bloco ; ListaDecl $                                                                     | : integer ) : integer …          | casar ':'
+   44 | Tipo ParamCauda ) : Tipo ; Locais Bloco ; ListaDecl $                                                                       | integer ) : integer ; …          | expandir (10) Tipo -> integer
+   45 | integer ParamCauda ) : Tipo ; Locais Bloco ; ListaDecl $                                                                    | integer ) : integer ; …          | casar 'integer'
+   46 | ParamCauda ) : Tipo ; Locais Bloco ; ListaDecl $                                                                            | ) : integer ; var …              | expandir (19) ParamCauda -> ε
+   47 | ) : Tipo ; Locais Bloco ; ListaDecl $                                                                                       | ) : integer ; var …              | casar ')'
+   48 | : Tipo ; Locais Bloco ; ListaDecl $                                                                                         | : integer ; var i …              | casar ':'
+   49 | Tipo ; Locais Bloco ; ListaDecl $                                                                                           | integer ; var i , …              | expandir (10) Tipo -> integer
+   50 | integer ; Locais Bloco ; ListaDecl $                                                                                        | integer ; var i , …              | casar 'integer'
+   51 | ; Locais Bloco ; ListaDecl $                                                                                                | ; var i , r …                    | casar ';'
+   52 | Locais Bloco ; ListaDecl $                                                                                                  | var i , r : …                    | expandir (21) Locais -> var DeclVar ListaVar
+   53 | var DeclVar ListaVar Bloco ; ListaDecl $                                                                                    | var i , r : …                    | casar 'var'
+   54 | DeclVar ListaVar Bloco ; ListaDecl $                                                                                        | i , r : integer …                | expandir (7) DeclVar -> id IdsCauda : Tipo ;
+   55 | id IdsCauda : Tipo ; ListaVar Bloco ; ListaDecl $                                                                           | i , r : integer …                | casar 'i'
+   56 | IdsCauda : Tipo ; ListaVar Bloco ; ListaDecl $                                                                              | , r : integer ; …                | expandir (8) IdsCauda -> , id IdsCauda
+   57 | , id IdsCauda : Tipo ; ListaVar Bloco ; ListaDecl $                                                                         | , r : integer ; …                | casar ','
+   58 | id IdsCauda : Tipo ; ListaVar Bloco ; ListaDecl $                                                                           | r : integer ; begin …            | casar 'r'
+   59 | IdsCauda : Tipo ; ListaVar Bloco ; ListaDecl $                                                                              | : integer ; begin r …            | expandir (9) IdsCauda -> ε
+   60 | : Tipo ; ListaVar Bloco ; ListaDecl $                                                                                       | : integer ; begin r …            | casar ':'
+   61 | Tipo ; ListaVar Bloco ; ListaDecl $                                                                                         | integer ; begin r := …           | expandir (10) Tipo -> integer
+   62 | integer ; ListaVar Bloco ; ListaDecl $                                                                                      | integer ; begin r := …           | casar 'integer'
+   63 | ; ListaVar Bloco ; ListaDecl $                                                                                              | ; begin r := 1 …                 | casar ';'
+   64 | ListaVar Bloco ; ListaDecl $                                                                                                | begin r := 1 ; …                 | expandir (24) ListaVar -> ε
+   65 | Bloco ; ListaDecl $                                                                                                         | begin r := 1 ; …                 | expandir (25) Bloco -> begin ListaCmd end
+   66 | begin ListaCmd end ; ListaDecl $                                                                                            | begin r := 1 ; …                 | casar 'begin'
+   67 | ListaCmd end ; ListaDecl $                                                                                                  | r := 1 ; i …                     | expandir (26) ListaCmd -> Cmd CmdCauda
+   68 | Cmd CmdCauda end ; ListaDecl $                                                                                              | r := 1 ; i …                     | expandir (29) Cmd -> id CmdId
+   69 | id CmdId CmdCauda end ; ListaDecl $                                                                                         | r := 1 ; i …                     | casar 'r'
+   70 | CmdId CmdCauda end ; ListaDecl $                                                                                            | := 1 ; i := …                    | expandir (34) CmdId -> := Expr
+   71 | := Expr CmdCauda end ; ListaDecl $                                                                                          | := 1 ; i := …                    | casar ':='
+   72 | Expr CmdCauda end ; ListaDecl $                                                                                             | 1 ; i := 2 …                     | expandir (39) Expr -> ExprSimples ExprCauda
+   73 | ExprSimples ExprCauda CmdCauda end ; ListaDecl $                                                                            | 1 ; i := 2 …                     | expandir (48) ExprSimples -> Termo SimplesCauda
+   74 | Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                     | 1 ; i := 2 …                     | expandir (54) Termo -> Fator TermoCauda
+   75 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | 1 ; i := 2 …                     | expandir (62) Fator -> num_int
+   76 | num_int TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                        | 1 ; i := 2 …                     | casar '1'
+   77 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | ; i := 2 ; …                     | expandir (56) TermoCauda -> ε
+   78 | SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                           | ; i := 2 ; …                     | expandir (50) SimplesCauda -> ε
+   79 | ExprCauda CmdCauda end ; ListaDecl $                                                                                        | ; i := 2 ; …                     | expandir (41) ExprCauda -> ε
+   80 | CmdCauda end ; ListaDecl $                                                                                                  | ; i := 2 ; …                     | expandir (27) CmdCauda -> ; Cmd CmdCauda
+   81 | ; Cmd CmdCauda end ; ListaDecl $                                                                                            | ; i := 2 ; …                     | casar ';'
+   82 | Cmd CmdCauda end ; ListaDecl $                                                                                              | i := 2 ; while …                 | expandir (29) Cmd -> id CmdId
+   83 | id CmdId CmdCauda end ; ListaDecl $                                                                                         | i := 2 ; while …                 | casar 'i'
+   84 | CmdId CmdCauda end ; ListaDecl $                                                                                            | := 2 ; while i …                 | expandir (34) CmdId -> := Expr
+   85 | := Expr CmdCauda end ; ListaDecl $                                                                                          | := 2 ; while i …                 | casar ':='
+   86 | Expr CmdCauda end ; ListaDecl $                                                                                             | 2 ; while i <= …                 | expandir (39) Expr -> ExprSimples ExprCauda
+   87 | ExprSimples ExprCauda CmdCauda end ; ListaDecl $                                                                            | 2 ; while i <= …                 | expandir (48) ExprSimples -> Termo SimplesCauda
+   88 | Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                     | 2 ; while i <= …                 | expandir (54) Termo -> Fator TermoCauda
+   89 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | 2 ; while i <= …                 | expandir (62) Fator -> num_int
+   90 | num_int TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                        | 2 ; while i <= …                 | casar '2'
+   91 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | ; while i <= n …                 | expandir (56) TermoCauda -> ε
+   92 | SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                           | ; while i <= n …                 | expandir (50) SimplesCauda -> ε
+   93 | ExprCauda CmdCauda end ; ListaDecl $                                                                                        | ; while i <= n …                 | expandir (41) ExprCauda -> ε
+   94 | CmdCauda end ; ListaDecl $                                                                                                  | ; while i <= n …                 | expandir (27) CmdCauda -> ; Cmd CmdCauda
+   95 | ; Cmd CmdCauda end ; ListaDecl $                                                                                            | ; while i <= n …                 | casar ';'
+   96 | Cmd CmdCauda end ; ListaDecl $                                                                                              | while i <= n do …                | expandir (31) Cmd -> while Expr do Cmd
+   97 | while Expr do Cmd CmdCauda end ; ListaDecl $                                                                                | while i <= n do …                | casar 'while'
+   98 | Expr do Cmd CmdCauda end ; ListaDecl $                                                                                      | i <= n do begin …                | expandir (39) Expr -> ExprSimples ExprCauda
+   99 | ExprSimples ExprCauda do Cmd CmdCauda end ; ListaDecl $                                                                     | i <= n do begin …                | expandir (48) ExprSimples -> Termo SimplesCauda
+  100 | Termo SimplesCauda ExprCauda do Cmd CmdCauda end ; ListaDecl $                                                              | i <= n do begin …                | expandir (54) Termo -> Fator TermoCauda
+  101 | Fator TermoCauda SimplesCauda ExprCauda do Cmd CmdCauda end ; ListaDecl $                                                   | i <= n do begin …                | expandir (66) Fator -> id FatorId
+  102 | id FatorId TermoCauda SimplesCauda ExprCauda do Cmd CmdCauda end ; ListaDecl $                                              | i <= n do begin …                | casar 'i'
+  103 | FatorId TermoCauda SimplesCauda ExprCauda do Cmd CmdCauda end ; ListaDecl $                                                 | <= n do begin r …                | expandir (72) FatorId -> ε
+  104 | TermoCauda SimplesCauda ExprCauda do Cmd CmdCauda end ; ListaDecl $                                                         | <= n do begin r …                | expandir (56) TermoCauda -> ε
+  105 | SimplesCauda ExprCauda do Cmd CmdCauda end ; ListaDecl $                                                                    | <= n do begin r …                | expandir (50) SimplesCauda -> ε
+  106 | ExprCauda do Cmd CmdCauda end ; ListaDecl $                                                                                 | <= n do begin r …                | expandir (40) ExprCauda -> Relop ExprSimples
+  107 | Relop ExprSimples do Cmd CmdCauda end ; ListaDecl $                                                                         | <= n do begin r …                | expandir (45) Relop -> <=
+  108 | <= ExprSimples do Cmd CmdCauda end ; ListaDecl $                                                                            | <= n do begin r …                | casar '<='
+  109 | ExprSimples do Cmd CmdCauda end ; ListaDecl $                                                                               | n do begin r := …                | expandir (48) ExprSimples -> Termo SimplesCauda
+  110 | Termo SimplesCauda do Cmd CmdCauda end ; ListaDecl $                                                                        | n do begin r := …                | expandir (54) Termo -> Fator TermoCauda
+  111 | Fator TermoCauda SimplesCauda do Cmd CmdCauda end ; ListaDecl $                                                             | n do begin r := …                | expandir (66) Fator -> id FatorId
+  112 | id FatorId TermoCauda SimplesCauda do Cmd CmdCauda end ; ListaDecl $                                                        | n do begin r := …                | casar 'n'
+  113 | FatorId TermoCauda SimplesCauda do Cmd CmdCauda end ; ListaDecl $                                                           | do begin r := r …                | expandir (72) FatorId -> ε
+  114 | TermoCauda SimplesCauda do Cmd CmdCauda end ; ListaDecl $                                                                   | do begin r := r …                | expandir (56) TermoCauda -> ε
+  115 | SimplesCauda do Cmd CmdCauda end ; ListaDecl $                                                                              | do begin r := r …                | expandir (50) SimplesCauda -> ε
+  116 | do Cmd CmdCauda end ; ListaDecl $                                                                                           | do begin r := r …                | casar 'do'
+  117 | Cmd CmdCauda end ; ListaDecl $                                                                                              | begin r := r * …                 | expandir (32) Cmd -> Bloco
+  118 | Bloco CmdCauda end ; ListaDecl $                                                                                            | begin r := r * …                 | expandir (25) Bloco -> begin ListaCmd end
+  119 | begin ListaCmd end CmdCauda end ; ListaDecl $                                                                               | begin r := r * …                 | casar 'begin'
+  120 | ListaCmd end CmdCauda end ; ListaDecl $                                                                                     | r := r * i …                     | expandir (26) ListaCmd -> Cmd CmdCauda
+  121 | Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                                                 | r := r * i …                     | expandir (29) Cmd -> id CmdId
+  122 | id CmdId CmdCauda end CmdCauda end ; ListaDecl $                                                                            | r := r * i …                     | casar 'r'
+  123 | CmdId CmdCauda end CmdCauda end ; ListaDecl $                                                                               | := r * i ; …                     | expandir (34) CmdId -> := Expr
+  124 | := Expr CmdCauda end CmdCauda end ; ListaDecl $                                                                             | := r * i ; …                     | casar ':='
+  125 | Expr CmdCauda end CmdCauda end ; ListaDecl $                                                                                | r * i ; i …                      | expandir (39) Expr -> ExprSimples ExprCauda
+  126 | ExprSimples ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                               | r * i ; i …                      | expandir (48) ExprSimples -> Termo SimplesCauda
+  127 | Termo SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                        | r * i ; i …                      | expandir (54) Termo -> Fator TermoCauda
+  128 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                             | r * i ; i …                      | expandir (66) Fator -> id FatorId
+  129 | id FatorId TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                        | r * i ; i …                      | casar 'r'
+  130 | FatorId TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                           | * i ; i := …                     | expandir (72) FatorId -> ε
+  131 | TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                   | * i ; i := …                     | expandir (55) TermoCauda -> Mulop Fator TermoCauda
+  132 | Mulop Fator TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                       | * i ; i := …                     | expandir (57) Mulop -> *
+  133 | * Fator TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                           | * i ; i := …                     | casar '*'
+  134 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                             | i ; i := i …                     | expandir (66) Fator -> id FatorId
+  135 | id FatorId TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                        | i ; i := i …                     | casar 'i'
+  136 | FatorId TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                           | ; i := i + …                     | expandir (72) FatorId -> ε
+  137 | TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                   | ; i := i + …                     | expandir (56) TermoCauda -> ε
+  138 | SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                              | ; i := i + …                     | expandir (50) SimplesCauda -> ε
+  139 | ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                                           | ; i := i + …                     | expandir (41) ExprCauda -> ε
+  140 | CmdCauda end CmdCauda end ; ListaDecl $                                                                                     | ; i := i + …                     | expandir (27) CmdCauda -> ; Cmd CmdCauda
+  141 | ; Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                                               | ; i := i + …                     | casar ';'
+  142 | Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                                                 | i := i + 1 …                     | expandir (29) Cmd -> id CmdId
+  143 | id CmdId CmdCauda end CmdCauda end ; ListaDecl $                                                                            | i := i + 1 …                     | casar 'i'
+  144 | CmdId CmdCauda end CmdCauda end ; ListaDecl $                                                                               | := i + 1 end …                   | expandir (34) CmdId -> := Expr
+  145 | := Expr CmdCauda end CmdCauda end ; ListaDecl $                                                                             | := i + 1 end …                   | casar ':='
+  146 | Expr CmdCauda end CmdCauda end ; ListaDecl $                                                                                | i + 1 end ; …                    | expandir (39) Expr -> ExprSimples ExprCauda
+  147 | ExprSimples ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                               | i + 1 end ; …                    | expandir (48) ExprSimples -> Termo SimplesCauda
+  148 | Termo SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                        | i + 1 end ; …                    | expandir (54) Termo -> Fator TermoCauda
+  149 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                             | i + 1 end ; …                    | expandir (66) Fator -> id FatorId
+  150 | id FatorId TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                        | i + 1 end ; …                    | casar 'i'
+  151 | FatorId TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                           | + 1 end ; Result …               | expandir (72) FatorId -> ε
+  152 | TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                   | + 1 end ; Result …               | expandir (56) TermoCauda -> ε
+  153 | SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                              | + 1 end ; Result …               | expandir (49) SimplesCauda -> Addop Termo SimplesCauda
+  154 | Addop Termo SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                  | + 1 end ; Result …               | expandir (51) Addop -> +
+  155 | + Termo SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                      | + 1 end ; Result …               | casar '+'
+  156 | Termo SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                        | 1 end ; Result := …              | expandir (54) Termo -> Fator TermoCauda
+  157 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                             | 1 end ; Result := …              | expandir (62) Fator -> num_int
+  158 | num_int TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                           | 1 end ; Result := …              | casar '1'
+  159 | TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                   | end ; Result := r …              | expandir (56) TermoCauda -> ε
+  160 | SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                              | end ; Result := r …              | expandir (50) SimplesCauda -> ε
+  161 | ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                                           | end ; Result := r …              | expandir (41) ExprCauda -> ε
+  162 | CmdCauda end CmdCauda end ; ListaDecl $                                                                                     | end ; Result := r …              | expandir (28) CmdCauda -> ε
+  163 | end CmdCauda end ; ListaDecl $                                                                                              | end ; Result := r …              | casar 'end'
+  164 | CmdCauda end ; ListaDecl $                                                                                                  | ; Result := r end …              | expandir (27) CmdCauda -> ; Cmd CmdCauda
+  165 | ; Cmd CmdCauda end ; ListaDecl $                                                                                            | ; Result := r end …              | casar ';'
+  166 | Cmd CmdCauda end ; ListaDecl $                                                                                              | Result := r end ; …              | expandir (29) Cmd -> id CmdId
+  167 | id CmdId CmdCauda end ; ListaDecl $                                                                                         | Result := r end ; …              | casar 'Result'
+  168 | CmdId CmdCauda end ; ListaDecl $                                                                                            | := r end ; procedure …           | expandir (34) CmdId -> := Expr
+  169 | := Expr CmdCauda end ; ListaDecl $                                                                                          | := r end ; procedure …           | casar ':='
+  170 | Expr CmdCauda end ; ListaDecl $                                                                                             | r end ; procedure imprime …      | expandir (39) Expr -> ExprSimples ExprCauda
+  171 | ExprSimples ExprCauda CmdCauda end ; ListaDecl $                                                                            | r end ; procedure imprime …      | expandir (48) ExprSimples -> Termo SimplesCauda
+  172 | Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                     | r end ; procedure imprime …      | expandir (54) Termo -> Fator TermoCauda
+  173 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | r end ; procedure imprime …      | expandir (66) Fator -> id FatorId
+  174 | id FatorId TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                     | r end ; procedure imprime …      | casar 'r'
+  175 | FatorId TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                        | end ; procedure imprime ( …      | expandir (72) FatorId -> ε
+  176 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | end ; procedure imprime ( …      | expandir (56) TermoCauda -> ε
+  177 | SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                           | end ; procedure imprime ( …      | expandir (50) SimplesCauda -> ε
+  178 | ExprCauda CmdCauda end ; ListaDecl $                                                                                        | end ; procedure imprime ( …      | expandir (41) ExprCauda -> ε
+  179 | CmdCauda end ; ListaDecl $                                                                                                  | end ; procedure imprime ( …      | expandir (28) CmdCauda -> ε
+  180 | end ; ListaDecl $                                                                                                           | end ; procedure imprime ( …      | casar 'end'
+  181 | ; ListaDecl $                                                                                                               | ; procedure imprime ( x …        | casar ';'
+  182 | ListaDecl $                                                                                                                 | procedure imprime ( x : …        | expandir (2) ListaDecl -> Decl ListaDecl
+  183 | Decl ListaDecl $                                                                                                            | procedure imprime ( x : …        | expandir (5) Decl -> DeclProc
+  184 | DeclProc ListaDecl $                                                                                                        | procedure imprime ( x : …        | expandir (13) DeclProc -> procedure id Params ; Locais Bloco ;
+  185 | procedure id Params ; Locais Bloco ; ListaDecl $                                                                            | procedure imprime ( x : …        | casar 'procedure'
+  186 | id Params ; Locais Bloco ; ListaDecl $                                                                                      | imprime ( x : integer …          | casar 'imprime'
+  187 | Params ; Locais Bloco ; ListaDecl $                                                                                         | ( x : integer ; …                | expandir (15) Params -> ( ListaParam )
+  188 | ( ListaParam ) ; Locais Bloco ; ListaDecl $                                                                                 | ( x : integer ; …                | casar '('
+  189 | ListaParam ) ; Locais Bloco ; ListaDecl $                                                                                   | x : integer ; y …                | expandir (17) ListaParam -> Param ParamCauda
+  190 | Param ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                             | x : integer ; y …                | expandir (20) Param -> id IdsCauda : Tipo
+  191 | id IdsCauda : Tipo ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                | x : integer ; y …                | casar 'x'
+  192 | IdsCauda : Tipo ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                   | : integer ; y : …                | expandir (9) IdsCauda -> ε
+  193 | : Tipo ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                            | : integer ; y : …                | casar ':'
+  194 | Tipo ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                              | integer ; y : real …             | expandir (10) Tipo -> integer
+  195 | integer ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                           | integer ; y : real …             | casar 'integer'
+  196 | ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                                   | ; y : real ) …                   | expandir (18) ParamCauda -> ; Param ParamCauda
+  197 | ; Param ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                           | ; y : real ) …                   | casar ';'
+  198 | Param ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                             | y : real ) ; …                   | expandir (20) Param -> id IdsCauda : Tipo
+  199 | id IdsCauda : Tipo ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                | y : real ) ; …                   | casar 'y'
+  200 | IdsCauda : Tipo ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                   | : real ) ; begin …               | expandir (9) IdsCauda -> ε
+  201 | : Tipo ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                            | : real ) ; begin …               | casar ':'
+  202 | Tipo ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                              | real ) ; begin end …             | expandir (11) Tipo -> real
+  203 | real ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                              | real ) ; begin end …             | casar 'real'
+  204 | ParamCauda ) ; Locais Bloco ; ListaDecl $                                                                                   | ) ; begin end ; …                | expandir (19) ParamCauda -> ε
+  205 | ) ; Locais Bloco ; ListaDecl $                                                                                              | ) ; begin end ; …                | casar ')'
+  206 | ; Locais Bloco ; ListaDecl $                                                                                                | ; begin end ; procedure …        | casar ';'
+  207 | Locais Bloco ; ListaDecl $                                                                                                  | begin end ; procedure principal … | expandir (22) Locais -> ε
+  208 | Bloco ; ListaDecl $                                                                                                         | begin end ; procedure principal … | expandir (25) Bloco -> begin ListaCmd end
+  209 | begin ListaCmd end ; ListaDecl $                                                                                            | begin end ; procedure principal … | casar 'begin'
+  210 | ListaCmd end ; ListaDecl $                                                                                                  | end ; procedure principal ; …    | expandir (26) ListaCmd -> Cmd CmdCauda
+  211 | Cmd CmdCauda end ; ListaDecl $                                                                                              | end ; procedure principal ; …    | expandir (33) Cmd -> ε
+  212 | CmdCauda end ; ListaDecl $                                                                                                  | end ; procedure principal ; …    | expandir (28) CmdCauda -> ε
+  213 | end ; ListaDecl $                                                                                                           | end ; procedure principal ; …    | casar 'end'
+  214 | ; ListaDecl $                                                                                                               | ; procedure principal ; var …    | casar ';'
+  215 | ListaDecl $                                                                                                                 | procedure principal ; var k …    | expandir (2) ListaDecl -> Decl ListaDecl
+  216 | Decl ListaDecl $                                                                                                            | procedure principal ; var k …    | expandir (5) Decl -> DeclProc
+  217 | DeclProc ListaDecl $                                                                                                        | procedure principal ; var k …    | expandir (13) DeclProc -> procedure id Params ; Locais Bloco ;
+  218 | procedure id Params ; Locais Bloco ; ListaDecl $                                                                            | procedure principal ; var k …    | casar 'procedure'
+  219 | id Params ; Locais Bloco ; ListaDecl $                                                                                      | principal ; var k : …            | casar 'principal'
+  220 | Params ; Locais Bloco ; ListaDecl $                                                                                         | ; var k : integer …              | expandir (16) Params -> ε
+  221 | ; Locais Bloco ; ListaDecl $                                                                                                | ; var k : integer …              | casar ';'
+  222 | Locais Bloco ; ListaDecl $                                                                                                  | var k : integer ; …              | expandir (21) Locais -> var DeclVar ListaVar
+  223 | var DeclVar ListaVar Bloco ; ListaDecl $                                                                                    | var k : integer ; …              | casar 'var'
+  224 | DeclVar ListaVar Bloco ; ListaDecl $                                                                                        | k : integer ; begin …            | expandir (7) DeclVar -> id IdsCauda : Tipo ;
+  225 | id IdsCauda : Tipo ; ListaVar Bloco ; ListaDecl $                                                                           | k : integer ; begin …            | casar 'k'
+  226 | IdsCauda : Tipo ; ListaVar Bloco ; ListaDecl $                                                                              | : integer ; begin k …            | expandir (9) IdsCauda -> ε
+  227 | : Tipo ; ListaVar Bloco ; ListaDecl $                                                                                       | : integer ; begin k …            | casar ':'
+  228 | Tipo ; ListaVar Bloco ; ListaDecl $                                                                                         | integer ; begin k := …           | expandir (10) Tipo -> integer
+  229 | integer ; ListaVar Bloco ; ListaDecl $                                                                                      | integer ; begin k := …           | casar 'integer'
+  230 | ; ListaVar Bloco ; ListaDecl $                                                                                              | ; begin k := ( …                 | casar ';'
+  231 | ListaVar Bloco ; ListaDecl $                                                                                                | begin k := ( 3 …                 | expandir (24) ListaVar -> ε
+  232 | Bloco ; ListaDecl $                                                                                                         | begin k := ( 3 …                 | expandir (25) Bloco -> begin ListaCmd end
+  233 | begin ListaCmd end ; ListaDecl $                                                                                            | begin k := ( 3 …                 | casar 'begin'
+  234 | ListaCmd end ; ListaDecl $                                                                                                  | k := ( 3 + …                     | expandir (26) ListaCmd -> Cmd CmdCauda
+  235 | Cmd CmdCauda end ; ListaDecl $                                                                                              | k := ( 3 + …                     | expandir (29) Cmd -> id CmdId
+  236 | id CmdId CmdCauda end ; ListaDecl $                                                                                         | k := ( 3 + …                     | casar 'k'
+  237 | CmdId CmdCauda end ; ListaDecl $                                                                                            | := ( 3 + 4 …                     | expandir (34) CmdId -> := Expr
+  238 | := Expr CmdCauda end ; ListaDecl $                                                                                          | := ( 3 + 4 …                     | casar ':='
+  239 | Expr CmdCauda end ; ListaDecl $                                                                                             | ( 3 + 4 ) …                      | expandir (39) Expr -> ExprSimples ExprCauda
+  240 | ExprSimples ExprCauda CmdCauda end ; ListaDecl $                                                                            | ( 3 + 4 ) …                      | expandir (48) ExprSimples -> Termo SimplesCauda
+  241 | Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                     | ( 3 + 4 ) …                      | expandir (54) Termo -> Fator TermoCauda
+  242 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | ( 3 + 4 ) …                      | expandir (67) Fator -> ( Expr )
+  243 | ( Expr ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                       | ( 3 + 4 ) …                      | casar '('
+  244 | Expr ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                         | 3 + 4 ) * …                      | expandir (39) Expr -> ExprSimples ExprCauda
+  245 | ExprSimples ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                        | 3 + 4 ) * …                      | expandir (48) ExprSimples -> Termo SimplesCauda
+  246 | Termo SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                 | 3 + 4 ) * …                      | expandir (54) Termo -> Fator TermoCauda
+  247 | Fator TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                      | 3 + 4 ) * …                      | expandir (62) Fator -> num_int
+  248 | num_int TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                    | 3 + 4 ) * …                      | casar '3'
+  249 | TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                            | + 4 ) * 2 …                      | expandir (56) TermoCauda -> ε
+  250 | SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                       | + 4 ) * 2 …                      | expandir (49) SimplesCauda -> Addop Termo SimplesCauda
+  251 | Addop Termo SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                           | + 4 ) * 2 …                      | expandir (51) Addop -> +
+  252 | + Termo SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                               | + 4 ) * 2 …                      | casar '+'
+  253 | Termo SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                 | 4 ) * 2 - …                      | expandir (54) Termo -> Fator TermoCauda
+  254 | Fator TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                      | 4 ) * 2 - …                      | expandir (62) Fator -> num_int
+  255 | num_int TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                    | 4 ) * 2 - …                      | casar '4'
+  256 | TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                            | ) * 2 - 10 …                     | expandir (56) TermoCauda -> ε
+  257 | SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                       | ) * 2 - 10 …                     | expandir (50) SimplesCauda -> ε
+  258 | ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                    | ) * 2 - 10 …                     | expandir (41) ExprCauda -> ε
+  259 | ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                              | ) * 2 - 10 …                     | casar ')'
+  260 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | * 2 - 10 div …                   | expandir (55) TermoCauda -> Mulop Fator TermoCauda
+  261 | Mulop Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                    | * 2 - 10 div …                   | expandir (57) Mulop -> *
+  262 | * Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                        | * 2 - 10 div …                   | casar '*'
+  263 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | 2 - 10 div 3 …                   | expandir (62) Fator -> num_int
+  264 | num_int TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                        | 2 - 10 div 3 …                   | casar '2'
+  265 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | - 10 div 3 ; …                   | expandir (56) TermoCauda -> ε
+  266 | SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                           | - 10 div 3 ; …                   | expandir (49) SimplesCauda -> Addop Termo SimplesCauda
+  267 | Addop Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                               | - 10 div 3 ; …                   | expandir (52) Addop -> -
+  268 | - Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                   | - 10 div 3 ; …                   | casar '-'
+  269 | Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                     | 10 div 3 ; media …               | expandir (54) Termo -> Fator TermoCauda
+  270 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | 10 div 3 ; media …               | expandir (62) Fator -> num_int
+  271 | num_int TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                        | 10 div 3 ; media …               | casar '10'
+  272 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | div 3 ; media := …               | expandir (55) TermoCauda -> Mulop Fator TermoCauda
+  273 | Mulop Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                    | div 3 ; media := …               | expandir (59) Mulop -> div
+  274 | div Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                      | div 3 ; media := …               | casar 'div'
+  275 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | 3 ; media := 7.5 …               | expandir (62) Fator -> num_int
+  276 | num_int TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                        | 3 ; media := 7.5 …               | casar '3'
+  277 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | ; media := 7.5 / …               | expandir (56) TermoCauda -> ε
+  278 | SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                           | ; media := 7.5 / …               | expandir (50) SimplesCauda -> ε
+  279 | ExprCauda CmdCauda end ; ListaDecl $                                                                                        | ; media := 7.5 / …               | expandir (41) ExprCauda -> ε
+  280 | CmdCauda end ; ListaDecl $                                                                                                  | ; media := 7.5 / …               | expandir (27) CmdCauda -> ; Cmd CmdCauda
+  281 | ; Cmd CmdCauda end ; ListaDecl $                                                                                            | ; media := 7.5 / …               | casar ';'
+  282 | Cmd CmdCauda end ; ListaDecl $                                                                                              | media := 7.5 / 2 …               | expandir (29) Cmd -> id CmdId
+  283 | id CmdId CmdCauda end ; ListaDecl $                                                                                         | media := 7.5 / 2 …               | casar 'media'
+  284 | CmdId CmdCauda end ; ListaDecl $                                                                                            | := 7.5 / 2 ; …                   | expandir (34) CmdId -> := Expr
+  285 | := Expr CmdCauda end ; ListaDecl $                                                                                          | := 7.5 / 2 ; …                   | casar ':='
+  286 | Expr CmdCauda end ; ListaDecl $                                                                                             | 7.5 / 2 ; ativo …                | expandir (39) Expr -> ExprSimples ExprCauda
+  287 | ExprSimples ExprCauda CmdCauda end ; ListaDecl $                                                                            | 7.5 / 2 ; ativo …                | expandir (48) ExprSimples -> Termo SimplesCauda
+  288 | Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                     | 7.5 / 2 ; ativo …                | expandir (54) Termo -> Fator TermoCauda
+  289 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | 7.5 / 2 ; ativo …                | expandir (63) Fator -> num_real
+  290 | num_real TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                       | 7.5 / 2 ; ativo …                | casar '7.5'
+  291 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | / 2 ; ativo := …                 | expandir (55) TermoCauda -> Mulop Fator TermoCauda
+  292 | Mulop Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                    | / 2 ; ativo := …                 | expandir (58) Mulop -> /
+  293 | / Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                        | / 2 ; ativo := …                 | casar '/'
+  294 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | 2 ; ativo := not …               | expandir (62) Fator -> num_int
+  295 | num_int TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                        | 2 ; ativo := not …               | casar '2'
+  296 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | ; ativo := not ( …               | expandir (56) TermoCauda -> ε
+  297 | SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                           | ; ativo := not ( …               | expandir (50) SimplesCauda -> ε
+  298 | ExprCauda CmdCauda end ; ListaDecl $                                                                                        | ; ativo := not ( …               | expandir (41) ExprCauda -> ε
+  299 | CmdCauda end ; ListaDecl $                                                                                                  | ; ativo := not ( …               | expandir (27) CmdCauda -> ; Cmd CmdCauda
+  300 | ; Cmd CmdCauda end ; ListaDecl $                                                                                            | ; ativo := not ( …               | casar ';'
+  301 | Cmd CmdCauda end ; ListaDecl $                                                                                              | ativo := not ( k …               | expandir (29) Cmd -> id CmdId
+  302 | id CmdId CmdCauda end ; ListaDecl $                                                                                         | ativo := not ( k …               | casar 'ativo'
+  303 | CmdId CmdCauda end ; ListaDecl $                                                                                            | := not ( k > …                   | expandir (34) CmdId -> := Expr
+  304 | := Expr CmdCauda end ; ListaDecl $                                                                                          | := not ( k > …                   | casar ':='
+  305 | Expr CmdCauda end ; ListaDecl $                                                                                             | not ( k > 5 …                    | expandir (39) Expr -> ExprSimples ExprCauda
+  306 | ExprSimples ExprCauda CmdCauda end ; ListaDecl $                                                                            | not ( k > 5 …                    | expandir (48) ExprSimples -> Termo SimplesCauda
+  307 | Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                     | not ( k > 5 …                    | expandir (54) Termo -> Fator TermoCauda
+  308 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | not ( k > 5 …                    | expandir (68) Fator -> not Fator
+  309 | not Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                      | not ( k > 5 …                    | casar 'not'
+  310 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | ( k > 5 ) …                      | expandir (67) Fator -> ( Expr )
+  311 | ( Expr ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                       | ( k > 5 ) …                      | casar '('
+  312 | Expr ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                         | k > 5 ) or …                     | expandir (39) Expr -> ExprSimples ExprCauda
+  313 | ExprSimples ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                        | k > 5 ) or …                     | expandir (48) ExprSimples -> Termo SimplesCauda
+  314 | Termo SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                 | k > 5 ) or …                     | expandir (54) Termo -> Fator TermoCauda
+  315 | Fator TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                      | k > 5 ) or …                     | expandir (66) Fator -> id FatorId
+  316 | id FatorId TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                 | k > 5 ) or …                     | casar 'k'
+  317 | FatorId TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                    | > 5 ) or ( …                     | expandir (72) FatorId -> ε
+  318 | TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                            | > 5 ) or ( …                     | expandir (56) TermoCauda -> ε
+  319 | SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                       | > 5 ) or ( …                     | expandir (50) SimplesCauda -> ε
+  320 | ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                    | > 5 ) or ( …                     | expandir (40) ExprCauda -> Relop ExprSimples
+  321 | Relop ExprSimples ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                            | > 5 ) or ( …                     | expandir (46) Relop -> >
+  322 | > ExprSimples ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                | > 5 ) or ( …                     | casar '>'
+  323 | ExprSimples ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                  | 5 ) or ( k …                     | expandir (48) ExprSimples -> Termo SimplesCauda
+  324 | Termo SimplesCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                           | 5 ) or ( k …                     | expandir (54) Termo -> Fator TermoCauda
+  325 | Fator TermoCauda SimplesCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                | 5 ) or ( k …                     | expandir (62) Fator -> num_int
+  326 | num_int TermoCauda SimplesCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                              | 5 ) or ( k …                     | casar '5'
+  327 | TermoCauda SimplesCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                      | ) or ( k = …                     | expandir (56) TermoCauda -> ε
+  328 | SimplesCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                 | ) or ( k = …                     | expandir (50) SimplesCauda -> ε
+  329 | ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                              | ) or ( k = …                     | casar ')'
+  330 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | or ( k = 3 …                     | expandir (56) TermoCauda -> ε
+  331 | SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                           | or ( k = 3 …                     | expandir (49) SimplesCauda -> Addop Termo SimplesCauda
+  332 | Addop Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                               | or ( k = 3 …                     | expandir (53) Addop -> or
+  333 | or Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                  | or ( k = 3 …                     | casar 'or'
+  334 | Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                     | ( k = 3 ) …                      | expandir (54) Termo -> Fator TermoCauda
+  335 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | ( k = 3 ) …                      | expandir (67) Fator -> ( Expr )
+  336 | ( Expr ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                       | ( k = 3 ) …                      | casar '('
+  337 | Expr ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                         | k = 3 ) and …                    | expandir (39) Expr -> ExprSimples ExprCauda
+  338 | ExprSimples ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                        | k = 3 ) and …                    | expandir (48) ExprSimples -> Termo SimplesCauda
+  339 | Termo SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                 | k = 3 ) and …                    | expandir (54) Termo -> Fator TermoCauda
+  340 | Fator TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                      | k = 3 ) and …                    | expandir (66) Fator -> id FatorId
+  341 | id FatorId TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                 | k = 3 ) and …                    | casar 'k'
+  342 | FatorId TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                    | = 3 ) and true …                 | expandir (72) FatorId -> ε
+  343 | TermoCauda SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                            | = 3 ) and true …                 | expandir (56) TermoCauda -> ε
+  344 | SimplesCauda ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                       | = 3 ) and true …                 | expandir (50) SimplesCauda -> ε
+  345 | ExprCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                    | = 3 ) and true …                 | expandir (40) ExprCauda -> Relop ExprSimples
+  346 | Relop ExprSimples ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                            | = 3 ) and true …                 | expandir (42) Relop -> =
+  347 | = ExprSimples ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                | = 3 ) and true …                 | casar '='
+  348 | ExprSimples ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                  | 3 ) and true ; …                 | expandir (48) ExprSimples -> Termo SimplesCauda
+  349 | Termo SimplesCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                           | 3 ) and true ; …                 | expandir (54) Termo -> Fator TermoCauda
+  350 | Fator TermoCauda SimplesCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                | 3 ) and true ; …                 | expandir (62) Fator -> num_int
+  351 | num_int TermoCauda SimplesCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                              | 3 ) and true ; …                 | casar '3'
+  352 | TermoCauda SimplesCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                      | ) and true ; if …                | expandir (56) TermoCauda -> ε
+  353 | SimplesCauda ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                 | ) and true ; if …                | expandir (50) SimplesCauda -> ε
+  354 | ) TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                              | ) and true ; if …                | casar ')'
+  355 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | and true ; if k …                | expandir (55) TermoCauda -> Mulop Fator TermoCauda
+  356 | Mulop Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                    | and true ; if k …                | expandir (61) Mulop -> and
+  357 | and Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                      | and true ; if k …                | casar 'and'
+  358 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | true ; if k >= …                 | expandir (64) Fator -> true
+  359 | true TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                           | true ; if k >= …                 | casar 'true'
+  360 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | ; if k >= 10 …                   | expandir (56) TermoCauda -> ε
+  361 | SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                           | ; if k >= 10 …                   | expandir (50) SimplesCauda -> ε
+  362 | ExprCauda CmdCauda end ; ListaDecl $                                                                                        | ; if k >= 10 …                   | expandir (41) ExprCauda -> ε
+  363 | CmdCauda end ; ListaDecl $                                                                                                  | ; if k >= 10 …                   | expandir (27) CmdCauda -> ; Cmd CmdCauda
+  364 | ; Cmd CmdCauda end ; ListaDecl $                                                                                            | ; if k >= 10 …                   | casar ';'
+  365 | Cmd CmdCauda end ; ListaDecl $                                                                                              | if k >= 10 then …                | expandir (30) Cmd -> if Expr then Cmd SenaoOpc
+  366 | if Expr then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                        | if k >= 10 then …                | casar 'if'
+  367 | Expr then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                           | k >= 10 then total …             | expandir (39) Expr -> ExprSimples ExprCauda
+  368 | ExprSimples ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                          | k >= 10 then total …             | expandir (48) ExprSimples -> Termo SimplesCauda
+  369 | Termo SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                   | k >= 10 then total …             | expandir (54) Termo -> Fator TermoCauda
+  370 | Fator TermoCauda SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                        | k >= 10 then total …             | expandir (66) Fator -> id FatorId
+  371 | id FatorId TermoCauda SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                   | k >= 10 then total …             | casar 'k'
+  372 | FatorId TermoCauda SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                      | >= 10 then total := …            | expandir (72) FatorId -> ε
+  373 | TermoCauda SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                              | >= 10 then total := …            | expandir (56) TermoCauda -> ε
+  374 | SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                         | >= 10 then total := …            | expandir (50) SimplesCauda -> ε
+  375 | ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                      | >= 10 then total := …            | expandir (40) ExprCauda -> Relop ExprSimples
+  376 | Relop ExprSimples then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                              | >= 10 then total := …            | expandir (47) Relop -> >=
+  377 | >= ExprSimples then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                 | >= 10 then total := …            | casar '>='
+  378 | ExprSimples then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                    | 10 then total := fatorial …      | expandir (48) ExprSimples -> Termo SimplesCauda
+  379 | Termo SimplesCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                             | 10 then total := fatorial …      | expandir (54) Termo -> Fator TermoCauda
+  380 | Fator TermoCauda SimplesCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                  | 10 then total := fatorial …      | expandir (62) Fator -> num_int
+  381 | num_int TermoCauda SimplesCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                | 10 then total := fatorial …      | casar '10'
+  382 | TermoCauda SimplesCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                        | then total := fatorial ( …       | expandir (56) TermoCauda -> ε
+  383 | SimplesCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                   | then total := fatorial ( …       | expandir (50) SimplesCauda -> ε
+  384 | then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                                | then total := fatorial ( …       | casar 'then'
+  385 | Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                                     | total := fatorial ( 5 …          | expandir (29) Cmd -> id CmdId
+  386 | id CmdId SenaoOpc CmdCauda end ; ListaDecl $                                                                                | total := fatorial ( 5 …          | casar 'total'
+  387 | CmdId SenaoOpc CmdCauda end ; ListaDecl $                                                                                   | := fatorial ( 5 ) …              | expandir (34) CmdId -> := Expr
+  388 | := Expr SenaoOpc CmdCauda end ; ListaDecl $                                                                                 | := fatorial ( 5 ) …              | casar ':='
+  389 | Expr SenaoOpc CmdCauda end ; ListaDecl $                                                                                    | fatorial ( 5 ) else …            | expandir (39) Expr -> ExprSimples ExprCauda
+  390 | ExprSimples ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                                   | fatorial ( 5 ) else …            | expandir (48) ExprSimples -> Termo SimplesCauda
+  391 | Termo SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                            | fatorial ( 5 ) else …            | expandir (54) Termo -> Fator TermoCauda
+  392 | Fator TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                 | fatorial ( 5 ) else …            | expandir (66) Fator -> id FatorId
+  393 | id FatorId TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                            | fatorial ( 5 ) else …            | casar 'fatorial'
+  394 | FatorId TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                               | ( 5 ) else if …                  | expandir (71) FatorId -> ( Args )
+  395 | ( Args ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                              | ( 5 ) else if …                  | casar '('
+  396 | Args ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                | 5 ) else if k …                  | expandir (73) Args -> Expr ArgsCauda
+  397 | Expr ArgsCauda ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                      | 5 ) else if k …                  | expandir (39) Expr -> ExprSimples ExprCauda
+  398 | ExprSimples ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                     | 5 ) else if k …                  | expandir (48) ExprSimples -> Termo SimplesCauda
+  399 | Termo SimplesCauda ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $              | 5 ) else if k …                  | expandir (54) Termo -> Fator TermoCauda
+  400 | Fator TermoCauda SimplesCauda ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl …   | 5 ) else if k …                  | expandir (62) Fator -> num_int
+  401 | num_int TermoCauda SimplesCauda ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl … | 5 ) else if k …                  | casar '5'
+  402 | TermoCauda SimplesCauda ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $         | ) else if k <> …                 | expandir (56) TermoCauda -> ε
+  403 | SimplesCauda ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                    | ) else if k <> …                 | expandir (50) SimplesCauda -> ε
+  404 | ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                 | ) else if k <> …                 | expandir (41) ExprCauda -> ε
+  405 | ArgsCauda ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                           | ) else if k <> …                 | expandir (76) ArgsCauda -> ε
+  406 | ) TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                     | ) else if k <> …                 | casar ')'
+  407 | TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                       | else if k <> 0 …                 | expandir (56) TermoCauda -> ε
+  408 | SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                                  | else if k <> 0 …                 | expandir (50) SimplesCauda -> ε
+  409 | ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                                               | else if k <> 0 …                 | expandir (41) ExprCauda -> ε
+  410 | SenaoOpc CmdCauda end ; ListaDecl $                                                                                         | else if k <> 0 …                 | expandir (37) SenaoOpc -> else Cmd
+  411 | else Cmd CmdCauda end ; ListaDecl $                                                                                         | else if k <> 0 …                 | casar 'else'
+  412 | Cmd CmdCauda end ; ListaDecl $                                                                                              | if k <> 0 then …                 | expandir (30) Cmd -> if Expr then Cmd SenaoOpc
+  413 | if Expr then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                        | if k <> 0 then …                 | casar 'if'
+  414 | Expr then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                           | k <> 0 then total …              | expandir (39) Expr -> ExprSimples ExprCauda
+  415 | ExprSimples ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                          | k <> 0 then total …              | expandir (48) ExprSimples -> Termo SimplesCauda
+  416 | Termo SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                   | k <> 0 then total …              | expandir (54) Termo -> Fator TermoCauda
+  417 | Fator TermoCauda SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                        | k <> 0 then total …              | expandir (66) Fator -> id FatorId
+  418 | id FatorId TermoCauda SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                   | k <> 0 then total …              | casar 'k'
+  419 | FatorId TermoCauda SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                      | <> 0 then total := …             | expandir (72) FatorId -> ε
+  420 | TermoCauda SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                              | <> 0 then total := …             | expandir (56) TermoCauda -> ε
+  421 | SimplesCauda ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                         | <> 0 then total := …             | expandir (50) SimplesCauda -> ε
+  422 | ExprCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                      | <> 0 then total := …             | expandir (40) ExprCauda -> Relop ExprSimples
+  423 | Relop ExprSimples then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                              | <> 0 then total := …             | expandir (43) Relop -> <>
+  424 | <> ExprSimples then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                 | <> 0 then total := …             | casar '<>'
+  425 | ExprSimples then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                    | 0 then total := - …              | expandir (48) ExprSimples -> Termo SimplesCauda
+  426 | Termo SimplesCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                             | 0 then total := - …              | expandir (54) Termo -> Fator TermoCauda
+  427 | Fator TermoCauda SimplesCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                  | 0 then total := - …              | expandir (62) Fator -> num_int
+  428 | num_int TermoCauda SimplesCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                | 0 then total := - …              | casar '0'
+  429 | TermoCauda SimplesCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                        | then total := - 1 …              | expandir (56) TermoCauda -> ε
+  430 | SimplesCauda then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                   | then total := - 1 …              | expandir (50) SimplesCauda -> ε
+  431 | then Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                                | then total := - 1 …              | casar 'then'
+  432 | Cmd SenaoOpc CmdCauda end ; ListaDecl $                                                                                     | total := - 1 else …              | expandir (29) Cmd -> id CmdId
+  433 | id CmdId SenaoOpc CmdCauda end ; ListaDecl $                                                                                | total := - 1 else …              | casar 'total'
+  434 | CmdId SenaoOpc CmdCauda end ; ListaDecl $                                                                                   | := - 1 else total …              | expandir (34) CmdId -> := Expr
+  435 | := Expr SenaoOpc CmdCauda end ; ListaDecl $                                                                                 | := - 1 else total …              | casar ':='
+  436 | Expr SenaoOpc CmdCauda end ; ListaDecl $                                                                                    | - 1 else total := …              | expandir (39) Expr -> ExprSimples ExprCauda
+  437 | ExprSimples ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                                   | - 1 else total := …              | expandir (48) ExprSimples -> Termo SimplesCauda
+  438 | Termo SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                            | - 1 else total := …              | expandir (54) Termo -> Fator TermoCauda
+  439 | Fator TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                 | - 1 else total := …              | expandir (69) Fator -> - Fator
+  440 | - Fator TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                               | - 1 else total := …              | casar '-'
+  441 | Fator TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                 | 1 else total := + …              | expandir (62) Fator -> num_int
+  442 | num_int TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                               | 1 else total := + …              | casar '1'
+  443 | TermoCauda SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                       | else total := + 1 …              | expandir (56) TermoCauda -> ε
+  444 | SimplesCauda ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                                  | else total := + 1 …              | expandir (50) SimplesCauda -> ε
+  445 | ExprCauda SenaoOpc CmdCauda end ; ListaDecl $                                                                               | else total := + 1 …              | expandir (41) ExprCauda -> ε
+  446 | SenaoOpc CmdCauda end ; ListaDecl $                                                                                         | else total := + 1 …              | expandir (37) SenaoOpc -> else Cmd
+  447 | else Cmd CmdCauda end ; ListaDecl $                                                                                         | else total := + 1 …              | casar 'else'
+  448 | Cmd CmdCauda end ; ListaDecl $                                                                                              | total := + 1 ; …                 | expandir (29) Cmd -> id CmdId
+  449 | id CmdId CmdCauda end ; ListaDecl $                                                                                         | total := + 1 ; …                 | casar 'total'
+  450 | CmdId CmdCauda end ; ListaDecl $                                                                                            | := + 1 ; imprime …               | expandir (34) CmdId -> := Expr
+  451 | := Expr CmdCauda end ; ListaDecl $                                                                                          | := + 1 ; imprime …               | casar ':='
+  452 | Expr CmdCauda end ; ListaDecl $                                                                                             | + 1 ; imprime ( …                | expandir (39) Expr -> ExprSimples ExprCauda
+  453 | ExprSimples ExprCauda CmdCauda end ; ListaDecl $                                                                            | + 1 ; imprime ( …                | expandir (48) ExprSimples -> Termo SimplesCauda
+  454 | Termo SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                     | + 1 ; imprime ( …                | expandir (54) Termo -> Fator TermoCauda
+  455 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | + 1 ; imprime ( …                | expandir (70) Fator -> + Fator
+  456 | + Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                        | + 1 ; imprime ( …                | casar '+'
+  457 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                          | 1 ; imprime ( k …                | expandir (62) Fator -> num_int
+  458 | num_int TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                        | 1 ; imprime ( k …                | casar '1'
+  459 | TermoCauda SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                | ; imprime ( k , …                | expandir (56) TermoCauda -> ε
+  460 | SimplesCauda ExprCauda CmdCauda end ; ListaDecl $                                                                           | ; imprime ( k , …                | expandir (50) SimplesCauda -> ε
+  461 | ExprCauda CmdCauda end ; ListaDecl $                                                                                        | ; imprime ( k , …                | expandir (41) ExprCauda -> ε
+  462 | CmdCauda end ; ListaDecl $                                                                                                  | ; imprime ( k , …                | expandir (27) CmdCauda -> ; Cmd CmdCauda
+  463 | ; Cmd CmdCauda end ; ListaDecl $                                                                                            | ; imprime ( k , …                | casar ';'
+  464 | Cmd CmdCauda end ; ListaDecl $                                                                                              | imprime ( k , 2.5 …              | expandir (29) Cmd -> id CmdId
+  465 | id CmdId CmdCauda end ; ListaDecl $                                                                                         | imprime ( k , 2.5 …              | casar 'imprime'
+  466 | CmdId CmdCauda end ; ListaDecl $                                                                                            | ( k , 2.5 ) …                    | expandir (35) CmdId -> ( Args )
+  467 | ( Args ) CmdCauda end ; ListaDecl $                                                                                         | ( k , 2.5 ) …                    | casar '('
+  468 | Args ) CmdCauda end ; ListaDecl $                                                                                           | k , 2.5 ) ; …                    | expandir (73) Args -> Expr ArgsCauda
+  469 | Expr ArgsCauda ) CmdCauda end ; ListaDecl $                                                                                 | k , 2.5 ) ; …                    | expandir (39) Expr -> ExprSimples ExprCauda
+  470 | ExprSimples ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                                | k , 2.5 ) ; …                    | expandir (48) ExprSimples -> Termo SimplesCauda
+  471 | Termo SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                         | k , 2.5 ) ; …                    | expandir (54) Termo -> Fator TermoCauda
+  472 | Fator TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                              | k , 2.5 ) ; …                    | expandir (66) Fator -> id FatorId
+  473 | id FatorId TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                         | k , 2.5 ) ; …                    | casar 'k'
+  474 | FatorId TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                            | , 2.5 ) ; imprime …              | expandir (72) FatorId -> ε
+  475 | TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                    | , 2.5 ) ; imprime …              | expandir (56) TermoCauda -> ε
+  476 | SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                               | , 2.5 ) ; imprime …              | expandir (50) SimplesCauda -> ε
+  477 | ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                                            | , 2.5 ) ; imprime …              | expandir (41) ExprCauda -> ε
+  478 | ArgsCauda ) CmdCauda end ; ListaDecl $                                                                                      | , 2.5 ) ; imprime …              | expandir (75) ArgsCauda -> , Expr ArgsCauda
+  479 | , Expr ArgsCauda ) CmdCauda end ; ListaDecl $                                                                               | , 2.5 ) ; imprime …              | casar ','
+  480 | Expr ArgsCauda ) CmdCauda end ; ListaDecl $                                                                                 | 2.5 ) ; imprime ( …              | expandir (39) Expr -> ExprSimples ExprCauda
+  481 | ExprSimples ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                                | 2.5 ) ; imprime ( …              | expandir (48) ExprSimples -> Termo SimplesCauda
+  482 | Termo SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                         | 2.5 ) ; imprime ( …              | expandir (54) Termo -> Fator TermoCauda
+  483 | Fator TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                              | 2.5 ) ; imprime ( …              | expandir (63) Fator -> num_real
+  484 | num_real TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                           | 2.5 ) ; imprime ( …              | casar '2.5'
+  485 | TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                    | ) ; imprime ( fatorial …         | expandir (56) TermoCauda -> ε
+  486 | SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                               | ) ; imprime ( fatorial …         | expandir (50) SimplesCauda -> ε
+  487 | ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                                            | ) ; imprime ( fatorial …         | expandir (41) ExprCauda -> ε
+  488 | ArgsCauda ) CmdCauda end ; ListaDecl $                                                                                      | ) ; imprime ( fatorial …         | expandir (76) ArgsCauda -> ε
+  489 | ) CmdCauda end ; ListaDecl $                                                                                                | ) ; imprime ( fatorial …         | casar ')'
+  490 | CmdCauda end ; ListaDecl $                                                                                                  | ; imprime ( fatorial ( …         | expandir (27) CmdCauda -> ; Cmd CmdCauda
+  491 | ; Cmd CmdCauda end ; ListaDecl $                                                                                            | ; imprime ( fatorial ( …         | casar ';'
+  492 | Cmd CmdCauda end ; ListaDecl $                                                                                              | imprime ( fatorial ( 3 …         | expandir (29) Cmd -> id CmdId
+  493 | id CmdId CmdCauda end ; ListaDecl $                                                                                         | imprime ( fatorial ( 3 …         | casar 'imprime'
+  494 | CmdId CmdCauda end ; ListaDecl $                                                                                            | ( fatorial ( 3 ) …               | expandir (35) CmdId -> ( Args )
+  495 | ( Args ) CmdCauda end ; ListaDecl $                                                                                         | ( fatorial ( 3 ) …               | casar '('
+  496 | Args ) CmdCauda end ; ListaDecl $                                                                                           | fatorial ( 3 ) + …               | expandir (73) Args -> Expr ArgsCauda
+  497 | Expr ArgsCauda ) CmdCauda end ; ListaDecl $                                                                                 | fatorial ( 3 ) + …               | expandir (39) Expr -> ExprSimples ExprCauda
+  498 | ExprSimples ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                                | fatorial ( 3 ) + …               | expandir (48) ExprSimples -> Termo SimplesCauda
+  499 | Termo SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                         | fatorial ( 3 ) + …               | expandir (54) Termo -> Fator TermoCauda
+  500 | Fator TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                              | fatorial ( 3 ) + …               | expandir (66) Fator -> id FatorId
+  501 | id FatorId TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                         | fatorial ( 3 ) + …               | casar 'fatorial'
+  502 | FatorId TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                            | ( 3 ) + 1 …                      | expandir (71) FatorId -> ( Args )
+  503 | ( Args ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                           | ( 3 ) + 1 …                      | casar '('
+  504 | Args ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                             | 3 ) + 1 , …                      | expandir (73) Args -> Expr ArgsCauda
+  505 | Expr ArgsCauda ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                   | 3 ) + 1 , …                      | expandir (39) Expr -> ExprSimples ExprCauda
+  506 | ExprSimples ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                  | 3 ) + 1 , …                      | expandir (48) ExprSimples -> Termo SimplesCauda
+  507 | Termo SimplesCauda ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl …           | 3 ) + 1 , …                      | expandir (54) Termo -> Fator TermoCauda
+  508 | Fator TermoCauda SimplesCauda ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; …          | 3 ) + 1 , …                      | expandir (62) Fator -> num_int
+  509 | num_int TermoCauda SimplesCauda ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; …        | 3 ) + 1 , …                      | casar '3'
+  510 | TermoCauda SimplesCauda ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl …      | ) + 1 , media …                  | expandir (56) TermoCauda -> ε
+  511 | SimplesCauda ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                 | ) + 1 , media …                  | expandir (50) SimplesCauda -> ε
+  512 | ExprCauda ArgsCauda ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                              | ) + 1 , media …                  | expandir (41) ExprCauda -> ε
+  513 | ArgsCauda ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                        | ) + 1 , media …                  | expandir (76) ArgsCauda -> ε
+  514 | ) TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                  | ) + 1 , media …                  | casar ')'
+  515 | TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                    | + 1 , media ) …                  | expandir (56) TermoCauda -> ε
+  516 | SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                               | + 1 , media ) …                  | expandir (49) SimplesCauda -> Addop Termo SimplesCauda
+  517 | Addop Termo SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                   | + 1 , media ) …                  | expandir (51) Addop -> +
+  518 | + Termo SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                       | + 1 , media ) …                  | casar '+'
+  519 | Termo SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                         | 1 , media ) ; …                  | expandir (54) Termo -> Fator TermoCauda
+  520 | Fator TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                              | 1 , media ) ; …                  | expandir (62) Fator -> num_int
+  521 | num_int TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                            | 1 , media ) ; …                  | casar '1'
+  522 | TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                    | , media ) ; BEGIN …              | expandir (56) TermoCauda -> ε
+  523 | SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                               | , media ) ; BEGIN …              | expandir (50) SimplesCauda -> ε
+  524 | ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                                            | , media ) ; BEGIN …              | expandir (41) ExprCauda -> ε
+  525 | ArgsCauda ) CmdCauda end ; ListaDecl $                                                                                      | , media ) ; BEGIN …              | expandir (75) ArgsCauda -> , Expr ArgsCauda
+  526 | , Expr ArgsCauda ) CmdCauda end ; ListaDecl $                                                                               | , media ) ; BEGIN …              | casar ','
+  527 | Expr ArgsCauda ) CmdCauda end ; ListaDecl $                                                                                 | media ) ; BEGIN While …          | expandir (39) Expr -> ExprSimples ExprCauda
+  528 | ExprSimples ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                                | media ) ; BEGIN While …          | expandir (48) ExprSimples -> Termo SimplesCauda
+  529 | Termo SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                         | media ) ; BEGIN While …          | expandir (54) Termo -> Fator TermoCauda
+  530 | Fator TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                              | media ) ; BEGIN While …          | expandir (66) Fator -> id FatorId
+  531 | id FatorId TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                         | media ) ; BEGIN While …          | casar 'media'
+  532 | FatorId TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                            | ) ; BEGIN While ativo …          | expandir (72) FatorId -> ε
+  533 | TermoCauda SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                    | ) ; BEGIN While ativo …          | expandir (56) TermoCauda -> ε
+  534 | SimplesCauda ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                               | ) ; BEGIN While ativo …          | expandir (50) SimplesCauda -> ε
+  535 | ExprCauda ArgsCauda ) CmdCauda end ; ListaDecl $                                                                            | ) ; BEGIN While ativo …          | expandir (41) ExprCauda -> ε
+  536 | ArgsCauda ) CmdCauda end ; ListaDecl $                                                                                      | ) ; BEGIN While ativo …          | expandir (76) ArgsCauda -> ε
+  537 | ) CmdCauda end ; ListaDecl $                                                                                                | ) ; BEGIN While ativo …          | casar ')'
+  538 | CmdCauda end ; ListaDecl $                                                                                                  | ; BEGIN While ativo Do …         | expandir (27) CmdCauda -> ; Cmd CmdCauda
+  539 | ; Cmd CmdCauda end ; ListaDecl $                                                                                            | ; BEGIN While ativo Do …         | casar ';'
+  540 | Cmd CmdCauda end ; ListaDecl $                                                                                              | BEGIN While ativo Do ativo …     | expandir (32) Cmd -> Bloco
+  541 | Bloco CmdCauda end ; ListaDecl $                                                                                            | BEGIN While ativo Do ativo …     | expandir (25) Bloco -> begin ListaCmd end
+  542 | begin ListaCmd end CmdCauda end ; ListaDecl $                                                                               | BEGIN While ativo Do ativo …     | casar 'BEGIN'
+  543 | ListaCmd end CmdCauda end ; ListaDecl $                                                                                     | While ativo Do ativo := …        | expandir (26) ListaCmd -> Cmd CmdCauda
+  544 | Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                                                 | While ativo Do ativo := …        | expandir (31) Cmd -> while Expr do Cmd
+  545 | while Expr do Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                                   | While ativo Do ativo := …        | casar 'While'
+  546 | Expr do Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                                         | ativo Do ativo := false …        | expandir (39) Expr -> ExprSimples ExprCauda
+  547 | ExprSimples ExprCauda do Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                        | ativo Do ativo := false …        | expandir (48) ExprSimples -> Termo SimplesCauda
+  548 | Termo SimplesCauda ExprCauda do Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                 | ativo Do ativo := false …        | expandir (54) Termo -> Fator TermoCauda
+  549 | Fator TermoCauda SimplesCauda ExprCauda do Cmd CmdCauda end CmdCauda end ; ListaDecl $                                      | ativo Do ativo := false …        | expandir (66) Fator -> id FatorId
+  550 | id FatorId TermoCauda SimplesCauda ExprCauda do Cmd CmdCauda end CmdCauda end ; ListaDecl $                                 | ativo Do ativo := false …        | casar 'ativo'
+  551 | FatorId TermoCauda SimplesCauda ExprCauda do Cmd CmdCauda end CmdCauda end ; ListaDecl $                                    | Do ativo := false END …          | expandir (72) FatorId -> ε
+  552 | TermoCauda SimplesCauda ExprCauda do Cmd CmdCauda end CmdCauda end ; ListaDecl $                                            | Do ativo := false END …          | expandir (56) TermoCauda -> ε
+  553 | SimplesCauda ExprCauda do Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                       | Do ativo := false END …          | expandir (50) SimplesCauda -> ε
+  554 | ExprCauda do Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                                    | Do ativo := false END …          | expandir (41) ExprCauda -> ε
+  555 | do Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                                              | Do ativo := false END …          | casar 'Do'
+  556 | Cmd CmdCauda end CmdCauda end ; ListaDecl $                                                                                 | ativo := false END end …         | expandir (29) Cmd -> id CmdId
+  557 | id CmdId CmdCauda end CmdCauda end ; ListaDecl $                                                                            | ativo := false END end …         | casar 'ativo'
+  558 | CmdId CmdCauda end CmdCauda end ; ListaDecl $                                                                               | := false END end ; …             | expandir (34) CmdId -> := Expr
+  559 | := Expr CmdCauda end CmdCauda end ; ListaDecl $                                                                             | := false END end ; …             | casar ':='
+  560 | Expr CmdCauda end CmdCauda end ; ListaDecl $                                                                                | false END end ; $                | expandir (39) Expr -> ExprSimples ExprCauda
+  561 | ExprSimples ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                               | false END end ; $                | expandir (48) ExprSimples -> Termo SimplesCauda
+  562 | Termo SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                        | false END end ; $                | expandir (54) Termo -> Fator TermoCauda
+  563 | Fator TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                             | false END end ; $                | expandir (65) Fator -> false
+  564 | false TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                             | false END end ; $                | casar 'false'
+  565 | TermoCauda SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                   | END end ; $                      | expandir (56) TermoCauda -> ε
+  566 | SimplesCauda ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                              | END end ; $                      | expandir (50) SimplesCauda -> ε
+  567 | ExprCauda CmdCauda end CmdCauda end ; ListaDecl $                                                                           | END end ; $                      | expandir (41) ExprCauda -> ε
+  568 | CmdCauda end CmdCauda end ; ListaDecl $                                                                                     | END end ; $                      | expandir (28) CmdCauda -> ε
+  569 | end CmdCauda end ; ListaDecl $                                                                                              | END end ; $                      | casar 'END'
+  570 | CmdCauda end ; ListaDecl $                                                                                                  | end ; $                          | expandir (28) CmdCauda -> ε
+  571 | end ; ListaDecl $                                                                                                           | end ; $                          | casar 'end'
+  572 | ; ListaDecl $                                                                                                               | ; $                              | casar ';'
+  573 | ListaDecl $                                                                                                                 | $                                | expandir (3) ListaDecl -> ε
+  574 | $                                                                                                                           | $                                | ACEITAR
+
+Tokens: 181 | Passos do autômato: 574
+Resultado: ACEITO (a entrada pertence à linguagem miniPascal)

@@ -1,0 +1,4 @@
+procedure p;
+begin
+  x := 3 # 4
+end;

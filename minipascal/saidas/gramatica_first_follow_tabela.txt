@@ -1,0 +1,228 @@
+PRODUÇÕES (76)
+  ( 1) Programa -> ListaDecl
+  ( 2) ListaDecl -> Decl ListaDecl
+  ( 3) ListaDecl -> ε
+  ( 4) Decl -> DeclVar
+  ( 5) Decl -> DeclProc
+  ( 6) Decl -> DeclFunc
+  ( 7) DeclVar -> id IdsCauda : Tipo ;
+  ( 8) IdsCauda -> , id IdsCauda
+  ( 9) IdsCauda -> ε
+  (10) Tipo -> integer
+  (11) Tipo -> real
+  (12) Tipo -> boolean
+  (13) DeclProc -> procedure id Params ; Locais Bloco ;
+  (14) DeclFunc -> function id Params : Tipo ; Locais Bloco ;
+  (15) Params -> ( ListaParam )
+  (16) Params -> ε
+  (17) ListaParam -> Param ParamCauda
+  (18) ParamCauda -> ; Param ParamCauda
+  (19) ParamCauda -> ε
+  (20) Param -> id IdsCauda : Tipo
+  (21) Locais -> var DeclVar ListaVar
+  (22) Locais -> ε
+  (23) ListaVar -> DeclVar ListaVar
+  (24) ListaVar -> ε
+  (25) Bloco -> begin ListaCmd end
+  (26) ListaCmd -> Cmd CmdCauda
+  (27) CmdCauda -> ; Cmd CmdCauda
+  (28) CmdCauda -> ε
+  (29) Cmd -> id CmdId
+  (30) Cmd -> if Expr then Cmd SenaoOpc
+  (31) Cmd -> while Expr do Cmd
+  (32) Cmd -> Bloco
+  (33) Cmd -> ε
+  (34) CmdId -> := Expr
+  (35) CmdId -> ( Args )
+  (36) CmdId -> ε
+  (37) SenaoOpc -> else Cmd
+  (38) SenaoOpc -> ε
+  (39) Expr -> ExprSimples ExprCauda
+  (40) ExprCauda -> Relop ExprSimples
+  (41) ExprCauda -> ε
+  (42) Relop -> =
+  (43) Relop -> <>
+  (44) Relop -> <
+  (45) Relop -> <=
+  (46) Relop -> >
+  (47) Relop -> >=
+  (48) ExprSimples -> Termo SimplesCauda
+  (49) SimplesCauda -> Addop Termo SimplesCauda
+  (50) SimplesCauda -> ε
+  (51) Addop -> +
+  (52) Addop -> -
+  (53) Addop -> or
+  (54) Termo -> Fator TermoCauda
+  (55) TermoCauda -> Mulop Fator TermoCauda
+  (56) TermoCauda -> ε
+  (57) Mulop -> *
+  (58) Mulop -> /
+  (59) Mulop -> div
+  (60) Mulop -> mod
+  (61) Mulop -> and
+  (62) Fator -> num_int
+  (63) Fator -> num_real
+  (64) Fator -> true
+  (65) Fator -> false
+  (66) Fator -> id FatorId
+  (67) Fator -> ( Expr )
+  (68) Fator -> not Fator
+  (69) Fator -> - Fator
+  (70) Fator -> + Fator
+  (71) FatorId -> ( Args )
+  (72) FatorId -> ε
+  (73) Args -> Expr ArgsCauda
+  (74) Args -> ε
+  (75) ArgsCauda -> , Expr ArgsCauda
+  (76) ArgsCauda -> ε
+
+ANULÁVEIS: Args, ArgsCauda, Cmd, CmdCauda, CmdId, ExprCauda, FatorId, IdsCauda, ListaCmd, ListaDecl, ListaVar, Locais, ParamCauda, Params, Programa, SenaoOpc, SimplesCauda, TermoCauda
+
+FIRST / FOLLOW
+  Programa      FIRST  = { function id procedure }
+                FOLLOW = { $ }
+  ListaDecl     FIRST  = { function id procedure }
+                FOLLOW = { $ }
+  Decl          FIRST  = { function id procedure }
+                FOLLOW = { $ function id procedure }
+  DeclVar       FIRST  = { id }
+                FOLLOW = { $ begin function id procedure }
+  IdsCauda      FIRST  = { , }
+                FOLLOW = { : }
+  Tipo          FIRST  = { boolean integer real }
+                FOLLOW = { ) ; }
+  DeclProc      FIRST  = { procedure }
+                FOLLOW = { $ function id procedure }
+  DeclFunc      FIRST  = { function }
+                FOLLOW = { $ function id procedure }
+  Params        FIRST  = { ( }
+                FOLLOW = { : ; }
+  ListaParam    FIRST  = { id }
+                FOLLOW = { ) }
+  ParamCauda    FIRST  = { ; }
+                FOLLOW = { ) }
+  Param         FIRST  = { id }
+                FOLLOW = { ) ; }
+  Locais        FIRST  = { var }
+                FOLLOW = { begin }
+  ListaVar      FIRST  = { id }
+                FOLLOW = { begin }
+  Bloco         FIRST  = { begin }
+                FOLLOW = { ; else end }
+  ListaCmd      FIRST  = { ; begin id if while }
+                FOLLOW = { end }
+  CmdCauda      FIRST  = { ; }
+                FOLLOW = { end }
+  Cmd           FIRST  = { begin id if while }
+                FOLLOW = { ; else end }
+  CmdId         FIRST  = { ( := }
+                FOLLOW = { ; else end }
+  SenaoOpc      FIRST  = { else }
+                FOLLOW = { ; else end }
+  Expr          FIRST  = { ( + - false id not num_int num_real true }
+                FOLLOW = { ) , ; do else end then }
+  ExprCauda     FIRST  = { < <= <> = > >= }
+                FOLLOW = { ) , ; do else end then }
+  Relop         FIRST  = { < <= <> = > >= }
+                FOLLOW = { ( + - false id not num_int num_real true }
+  ExprSimples   FIRST  = { ( + - false id not num_int num_real true }
+                FOLLOW = { ) , ; < <= <> = > >= do else end then }
+  SimplesCauda  FIRST  = { + - or }
+                FOLLOW = { ) , ; < <= <> = > >= do else end then }
+  Addop         FIRST  = { + - or }
+                FOLLOW = { ( + - false id not num_int num_real true }
+  Termo         FIRST  = { ( + - false id not num_int num_real true }
+                FOLLOW = { ) + , - ; < <= <> = > >= do else end or then }
+  TermoCauda    FIRST  = { * / and div mod }
+                FOLLOW = { ) + , - ; < <= <> = > >= do else end or then }
+  Mulop         FIRST  = { * / and div mod }
+                FOLLOW = { ( + - false id not num_int num_real true }
+  Fator         FIRST  = { ( + - false id not num_int num_real true }
+                FOLLOW = { ) * + , - / ; < <= <> = > >= and div do else end mod or then }
+  FatorId       FIRST  = { ( }
+                FOLLOW = { ) * + , - / ; < <= <> = > >= and div do else end mod or then }
+  Args          FIRST  = { ( + - false id not num_int num_real true }
+                FOLLOW = { ) }
+  ArgsCauda     FIRST  = { , }
+                FOLLOW = { ) }
+
+TABELA PREDITIVA (conjunto de seleção de cada produção)
+  ( 1) Programa -> ListaDecl                  seleciona { $ function id procedure }
+  ( 2) ListaDecl -> Decl ListaDecl            seleciona { function id procedure }
+  ( 3) ListaDecl -> ε                         seleciona { $ }
+  ( 4) Decl -> DeclVar                        seleciona { id }
+  ( 5) Decl -> DeclProc                       seleciona { procedure }
+  ( 6) Decl -> DeclFunc                       seleciona { function }
+  ( 7) DeclVar -> id IdsCauda : Tipo ;        seleciona { id }
+  ( 8) IdsCauda -> , id IdsCauda              seleciona { , }
+  ( 9) IdsCauda -> ε                          seleciona { : }
+  (10) Tipo -> integer                        seleciona { integer }
+  (11) Tipo -> real                           seleciona { real }
+  (12) Tipo -> boolean                        seleciona { boolean }
+  (13) DeclProc -> procedure id Params ; Locais Bloco ; seleciona { procedure }
+  (14) DeclFunc -> function id Params : Tipo ; Locais Bloco ; seleciona { function }
+  (15) Params -> ( ListaParam )               seleciona { ( }
+  (16) Params -> ε                            seleciona { : ; }
+  (17) ListaParam -> Param ParamCauda         seleciona { id }
+  (18) ParamCauda -> ; Param ParamCauda       seleciona { ; }
+  (19) ParamCauda -> ε                        seleciona { ) }
+  (20) Param -> id IdsCauda : Tipo            seleciona { id }
+  (21) Locais -> var DeclVar ListaVar         seleciona { var }
+  (22) Locais -> ε                            seleciona { begin }
+  (23) ListaVar -> DeclVar ListaVar           seleciona { id }
+  (24) ListaVar -> ε                          seleciona { begin }
+  (25) Bloco -> begin ListaCmd end            seleciona { begin }
+  (26) ListaCmd -> Cmd CmdCauda               seleciona { ; begin end id if while }
+  (27) CmdCauda -> ; Cmd CmdCauda             seleciona { ; }
+  (28) CmdCauda -> ε                          seleciona { end }
+  (29) Cmd -> id CmdId                        seleciona { id }
+  (30) Cmd -> if Expr then Cmd SenaoOpc       seleciona { if }
+  (31) Cmd -> while Expr do Cmd               seleciona { while }
+  (32) Cmd -> Bloco                           seleciona { begin }
+  (33) Cmd -> ε                               seleciona { ; else end }
+  (34) CmdId -> := Expr                       seleciona { := }
+  (35) CmdId -> ( Args )                      seleciona { ( }
+  (36) CmdId -> ε                             seleciona { ; else end }
+  (37) SenaoOpc -> else Cmd                   seleciona { else }
+  (38) SenaoOpc -> ε                          seleciona { ; else end }
+  (39) Expr -> ExprSimples ExprCauda          seleciona { ( + - false id not num_int num_real true }
+  (40) ExprCauda -> Relop ExprSimples         seleciona { < <= <> = > >= }
+  (41) ExprCauda -> ε                         seleciona { ) , ; do else end then }
+  (42) Relop -> =                             seleciona { = }
+  (43) Relop -> <>                            seleciona { <> }
+  (44) Relop -> <                             seleciona { < }
+  (45) Relop -> <=                            seleciona { <= }
+  (46) Relop -> >                             seleciona { > }
+  (47) Relop -> >=                            seleciona { >= }
+  (48) ExprSimples -> Termo SimplesCauda      seleciona { ( + - false id not num_int num_real true }
+  (49) SimplesCauda -> Addop Termo SimplesCauda seleciona { + - or }
+  (50) SimplesCauda -> ε                      seleciona { ) , ; < <= <> = > >= do else end then }
+  (51) Addop -> +                             seleciona { + }
+  (52) Addop -> -                             seleciona { - }
+  (53) Addop -> or                            seleciona { or }
+  (54) Termo -> Fator TermoCauda              seleciona { ( + - false id not num_int num_real true }
+  (55) TermoCauda -> Mulop Fator TermoCauda   seleciona { * / and div mod }
+  (56) TermoCauda -> ε                        seleciona { ) + , - ; < <= <> = > >= do else end or then }
+  (57) Mulop -> *                             seleciona { * }
+  (58) Mulop -> /                             seleciona { / }
+  (59) Mulop -> div                           seleciona { div }
+  (60) Mulop -> mod                           seleciona { mod }
+  (61) Mulop -> and                           seleciona { and }
+  (62) Fator -> num_int                       seleciona { num_int }
+  (63) Fator -> num_real                      seleciona { num_real }
+  (64) Fator -> true                          seleciona { true }
+  (65) Fator -> false                         seleciona { false }
+  (66) Fator -> id FatorId                    seleciona { id }
+  (67) Fator -> ( Expr )                      seleciona { ( }
+  (68) Fator -> not Fator                     seleciona { not }
+  (69) Fator -> - Fator                       seleciona { - }
+  (70) Fator -> + Fator                       seleciona { + }
+  (71) FatorId -> ( Args )                    seleciona { ( }
+  (72) FatorId -> ε                           seleciona { ) * + , - / ; < <= <> = > >= and div do else end mod or then }
+  (73) Args -> Expr ArgsCauda                 seleciona { ( + - false id not num_int num_real true }
+  (74) Args -> ε                              seleciona { ) }
+  (75) ArgsCauda -> , Expr ArgsCauda          seleciona { , }
+  (76) ArgsCauda -> ε                         seleciona { ) }
+
+CONFLITOS LL(1): 1
+  M[SenaoOpc, else]: produções (37, 38) -> escolhida (37) SenaoOpc -> else Cmd

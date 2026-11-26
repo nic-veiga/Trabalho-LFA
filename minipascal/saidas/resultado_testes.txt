@@ -1,0 +1,16 @@
+[OK ] validos   completo.pas                     aceito
+[OK ] validos   exemplo_enunciado.pas            aceito
+[OK ] validos   pequeno.pas                      aceito
+[OK ] validos   teste.pas                        aceito
+[OK ] validos   vazio.pas                        aceito
+[OK ] invalidos erro_atribuicao.pas              ERRO SINTÁTICO: em CmdId: encontrado '='; esperado um de: ( := ; else end
+[OK ] invalidos erro_bloco_solto.pas             ERRO SINTÁTICO: em ListaDecl: encontrado 'begin'; esperado um de: $ function id procedure
+[OK ] invalidos erro_comentario.pas              ERRO LÉXICO: comentário '{' não fechado
+[OK ] invalidos erro_expressao_vazia.pas         ERRO SINTÁTICO: em Expr: encontrado ';'; esperado um de: ( + - false id not num_int num_real true
+[OK ] invalidos erro_falta_end.pas               ERRO SINTÁTICO: em Cmd: encontrado fim do arquivo; esperado um de: ; begin else end id if while
+[OK ] invalidos erro_falta_ponto_virgula.pas     ERRO SINTÁTICO: esperado ';', encontrado 'procedure'
+[OK ] invalidos erro_falta_then.pas              ERRO SINTÁTICO: em TermoCauda: encontrado 'begin'; esperado um de: ) * + , - / ; < <= <> = > >= and div do else end mod or then
+[OK ] invalidos erro_lexico.pas                  ERRO LÉXICO: caractere inválido '#'
+[OK ] invalidos erro_tipo.pas                    ERRO SINTÁTICO: em Tipo: encontrado ';'; esperado um de: boolean integer real
+
+Todos os testes passaram.
